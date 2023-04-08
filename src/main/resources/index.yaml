@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  spring-boot-app:
+  - name: spring-boot-app
+    version: 1.0.0
+    description: A Helm chart for a Spring Boot application
+    home: https://github.com/Qasimhussain5753/demo-app
+    keywords:
+    - spring-boot
+    - java
+    - microservices
+    maintainers:
+    - name: Qasim Hussain
+      email: qasimhussain5753.qh.qh@gmail.com
