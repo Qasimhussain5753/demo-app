@@ -4,12 +4,10 @@
 
 replicaCount: 1
 
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
+# image:
+#   repository: https://github.com/Qasimhussain5753/demo-app
+#   tag: latest
+codeRepoURL: https://github.com/Qasimhussain5753/demo-app
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -80,3 +78,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  db_user: myuser
+  db_password: mypassword
+  db_host: mydatabase.example.com
