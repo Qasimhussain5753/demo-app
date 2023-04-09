@@ -1,0 +1,36 @@
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: demo-app
+  namespace: it22-kafka-dev
+  labels:
+    app: demo-app
+    tier: backend
+    version: v1
+spec:
+#  nodeSelector:
+#    node-role.kubernetes.io/worker-serial: worker2
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.codeRepoURL }}
+      ref: master
+    contextDir: /
+    sourceSecret:
+      name: demo-app # using ssh key secret with name pull-secret
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'demo-app:latest' # ImageStream where build will park the output image
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+#   triggers:
+#     - type: ImageChange
+#       imageChange: {}
+#     - type: ConfigChange
+#     - type: "github"
+#       bitbucket:
+#         secret: "secretvalue1"

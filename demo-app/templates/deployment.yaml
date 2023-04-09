@@ -1,61 +1,49 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "demo-app.fullname" . }}
+  name: demo-app
   labels:
-    {{- include "demo-app.labels" . | nindent 4 }}
+    app: demo-app
+    tier: backend
+    version: v1
+  annotations:
+    image.openshift.io/triggers: |-
+      [{"from":{"kind":"ImageStreamTag","name":"demo-app:latest","namespace":"it22-kafka-dev"},"fieldPath":"spec.template.spec.containers[?(@.name==\"demo-app\")].image","pause":"false"}]
+  namespace: it22-kafka-dev
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
-      {{- include "demo-app.selectorLabels" . | nindent 6 }}
+      app: demo-app
+      tier: backend
+      version: v1
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/worker-serial=worker2
+  replicas: 1
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      name: demo-app
       labels:
-        {{- include "demo-app.selectorLabels" . | nindent 8 }}
+        app: demo-app
+        tier: backend
+        version: v1
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "demo-app.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: demo-app
+          image: 'image-registry.openshift-image-registry.svc:5000/it22-kafka-dev/demo-app:latest'
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+            - containerPort: 4004
+          imagePullPolicy: Always   
+          env:
+            - name: MYSQL_DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: demo-app
+                  key: mysql.database.username
+
+            - name: MYSQL_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-app
+                  key: mysql.database.password

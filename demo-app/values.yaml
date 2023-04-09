@@ -7,7 +7,7 @@ replicaCount: 1
 # image:
 #   repository: https://github.com/Qasimhussain5753/demo-app
 #   tag: latest
-codeRepoURL: https://github.com/Qasimhussain5753/demo-app
+codeRepoURL: git@github.com:Qasimhussain5753/demo-app.git
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
